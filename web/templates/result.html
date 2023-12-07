@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024, user-scalable=yes">
+  {{ if eq . "WAIT..." }}
+  <meta http-equiv="refresh" content="3"> 
+  {{ end }}
+  <title>Result</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+ </head>
+ <body>
+ 	<base target="_self">
+ 	<div class="plato">
+ 		<div id="result">
+  	  <p>{{.}}</p>
+  	</div>
+ 	</div>
+ 	{{ if eq . "SUCCESS!" }}
+  <div class="quit">
+  	<button onclick="window.location.href='http://localhost:'+window.location.port">Home</button>
+  </div>
+  <div class="quit">
+  <div class="quit">
+  	<button onclick="window.location.href='http://localhost:'+window.location.port+'/quit'">Quit</button>
+  </div>
+  {{ end }}
+ </body>
+</html>
