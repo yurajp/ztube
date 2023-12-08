@@ -13,6 +13,7 @@ import (
 	
 	"github.com/yurajp/ztube/config"
   "github.com/kkdai/youtube/v2"
+  "github.com/gabriel-vasile/mimetype"
 )
 
 type Opts struct {
@@ -27,6 +28,7 @@ var (
 	path string
 	LinkChan = make(chan string, 1)
 	OnAir = false
+	Video string
 )
 
 func GetIdFromLink(url string) string {
@@ -110,9 +112,10 @@ func DownloadVideo(id, name string) error {
 		return fmt.Errorf("GetStreamErr: %s", err)
 	}
 	defer stream.Close()
-	
-	fname := Name2Song(name) + ".mp4"
-	file, err := os.Create(path + fname)
+
+	fname := Name2Song(name)
+	fpath := path + fname
+	file, err := os.Create(fpath)
 	if err != nil {
 		return err
 	}
@@ -121,8 +124,20 @@ func DownloadVideo(id, name string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("\n  Downloaded  %s\n  ", fname)
 	
+  mtype, err := mimetype.DetectFile(fpath)
+  if err != nil {
+  		return fmt.Errorf("Cannot detect MIME: %s", err)
+  }
+  ext := mtype.Extension()
+  Video = fpath + ext
+  
+  err = os.Rename(fpath, Video)
+	if err != nil {
+		return fmt.Errorf("Cannot rename: %s", err)
+	}
+	fmt.Printf("\n  Downloaded  %s\n  ", fname + ext)
+  
 	return nil
 }
 
@@ -131,9 +146,14 @@ func Name2Song(sng string) string {
 	return strings.ReplaceAll(sng, " ", "_")
 }
 
-func ConvertAudioFrom(vpath string) {
-	apath := strings.TrimSuffix(vpath, "4") + "3"
-	cmd := exec.Command("ffmpeg", "-i", vpath, apath)
+func ConvertToAudio() {
+	mtyp, err := mimetype.DetectFile(Video)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	audio := strings.TrimSuffix(Video, mtyp.Extension()) + ".mp3"
+	cmd := exec.Command("ffmpeg", "-i", Video, audio)
 	_, _ = cmd.Output()
 	
 	fmt.Println("  Audio extracted")
@@ -172,12 +192,12 @@ func (o Opts) Produce() error {
 	if err != nil {
 		return err
 	}
-	video := path + name + ".mp4"
 	if !o.VideoOnly {
-	  ConvertAudioFrom(video)
+	  ConvertToAudio()
 	}
 	if o.AudioOnly {
-		os.Remove(video)
+		os.Remove(Video)
+		Video = ""
 	}
   OnAir = false
   

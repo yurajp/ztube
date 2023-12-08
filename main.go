@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"fmt"
 	
 	"github.com/yurajp/ztube/config"
 	"github.com/yurajp/ztube/web"

@@ -82,3 +82,11 @@ func contHandler(w http.ResponseWriter, r *http.Request) {
 	exec.Command("nnn", dir).Run()
 	http.Redirect(w, r, "/", 302)
 }
+
+func watchHandler(w http.ResponseWriter, r *http.Request) {
+	v := utube.Video
+	if v == "" {
+		return
+	}
+	exec.Command("xdg-open", v).Run()
+}
