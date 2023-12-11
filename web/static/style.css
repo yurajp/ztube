@@ -12,13 +12,16 @@ body {
 	border: 10px solid darkgreen;
 	border-radius: 30px;
 }
-
-.plato h2 {
-	text-align: center;
-	padding: 10px 0px 40px 0px;
+#head {
+	display: flex;
+	justify-content: center;
+}
+#logo {
+	display: block;
+	padding: 20px 30px;
 	border: 6px solid darkgreen;
-	border-radius: 26px;
-	background: #666666;
+	border-radius: 88px;
+	background: #aaa;
 }
 
 .plato h2 span {
@@ -28,12 +31,12 @@ body {
 }
 
 .plato input {
-	margin: 30px 40px;
+	margin: 20px 40px;
 	width: 84%;
 	padding: 16px 40px;
 	font-size: 1.6em;
 	border-radius: 20px;
-	background: #D5EBEB;
+	background: #ccc;
 }
 
 .plato label {
@@ -49,6 +52,7 @@ body {
 	border-radius: 50px;
 	text-align:; center;
 	color: #025C4C;
+	background: #ccc;
 }
 
 .cbx {
@@ -80,5 +84,5 @@ body {
 	border-radius: 50px;
 	text-align:; center;
 	color: maroon;
-	background: #e2e2e2;
+	background: #bbb;
 }
