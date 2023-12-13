@@ -14,7 +14,6 @@ import (
 	"github.com/yurajp/ztube/config"
   "github.com/kkdai/youtube/v2"
   "github.com/gabriel-vasile/mimetype"
-  "github.com/frolovo22/tag"
 )
 
 type Opts struct {
@@ -112,11 +111,6 @@ func (o *Opts) FName() string {
 	return fmt.Sprintf("%s - %s", o.Artist, o.Title)
 }
 
-func (o *Opts) IName() string {
-	art := strings.ReplaceAll(o.Artist, " ", "_")
-	ttl := strings.ReplaceAll(o.Title, " ", "_")
-	return fmt.Sprintf("%s.%s", art, ttl)
-}
 
 func (o *Opts) DownloadVideo() error {
 	if o.Code == "" {
@@ -134,7 +128,6 @@ func (o *Opts) DownloadVideo() error {
 	}
 	defer stream.Close()
 
-// OR INAME
 	fname := o.FName()
 	fpath := path + fname
 	file, err := os.Create(fpath)
@@ -161,52 +154,6 @@ func (o *Opts) DownloadVideo() error {
 	fmt.Printf("\n  Downloaded  %s\n  ", fname + ext)
   
 	return nil
-}
-
-func Prettify(inm string) error {
-	nm := strings.ReplaceAll(inm, "_", " ")
-	nm = strings.Replace(nm, ".", " - ", 1)
-	if !strings.Contains(nm, "/") {
-		inm = path + inm
-		nm = path + nm
-	}
-	err := os.Rename(inm, nm)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (o *Opts) MakeAudio() error {
-	mtyp, err := mimetype.DetectFile(Video)
-	if err != nil {
-		return fmt.Errorf("MimeError: %s", err)
-	}
-	audio := strings.TrimSuffix(Video, mtyp.Extension()) + ".mp3"
-	cmd := exec.Command("ffmpeg", "-i", Video, audio)
-	_, err = cmd.Output()
-	if err != nil {
-		return fmt.Errorf("ConvertingAudioError: %s", err)
-	}
-	fmt.Println("  Audio extracted")
-	
-  meta, err := tag.ReadFile(audio)
-  if err != nil {
-	  return fmt.Errorf("ReadFileError: %s", err)
-  }
-  err = meta.SetTitle(o.Title)
-  if err != nil {
-	  return fmt.Errorf("SetTitleTagError: %s", err)
-  }
-  err = meta.SetArtist(o.Artist)
-    if err != nil {
-	    return fmt.Errorf("SetArtistTagError: %s", err)
-  }
-  err = meta.SaveFile(audio)
-  if err != nil {
-	  return fmt.Errorf("SaveFileError: %s", err)
-  }
-  return nil
 }
 
 func (o *Opts) OpenSearch() {
@@ -251,6 +198,10 @@ func (o *Opts) Produce(lnk string) error {
 	}
 	if !o.VideoOnly {
 	  err = o.MakeAudio()
+	  if err != nil {
+	  	return err
+	  }
+	  err = SaveImage(64, 500)
 	  if err != nil {
 	  	return err
 	  }
