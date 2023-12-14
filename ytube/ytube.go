@@ -151,7 +151,7 @@ func (o *Opts) DownloadVideo() error {
 	if err != nil {
 		return fmt.Errorf("Cannot rename: %s", err)
 	}
-	fmt.Printf("\n  Downloaded  %s\n  ", fname + ext)
+	fmt.Printf("\n  Downloaded  %s\n", fname + ext)
   
 	return nil
 }

@@ -59,7 +59,7 @@ func FrameImage(fileName string, frameNum int) (image.Image, error) {
   return img, nil
 }
 
-func ImageName() string {
+func ImagePath() string {
 	if Video == "" {
 		return ""
 	}
@@ -74,11 +74,12 @@ func SaveImage(frame, size int) error {
     return err
   }
   img = Crop(img, size)
-  imgFile := ImageName()
+  imgFile := ImagePath()
   err = imaging.Save(img, imgFile)
   if err != nil {
     return err
   }
+  fmt.Println("  DONE")
   return nil
 }  
 
