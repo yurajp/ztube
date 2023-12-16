@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024, user-scalable=yes">
+  <title>ZSong</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+ </head>
+ <body>
+	<div class="plato">
+		<div id="pic">
+			<img src="static/current.png" width="500px">
+		</div> 
+		<div id="tags">
+		  <p id="artist">{{ .Artist }}</p>
+		  <p id="title">{{ .Title }}</p>
+		</div>
+	  
+	  <div id="player">
+	  	
+			<a href={{.ActStop}}><img src="static/stop.png" width=146px></a>
+	{{ if eq .Info "Playing" }}
+			<a href={{.ActPause}}><img src="static/pause.png" width=146px></a>
+		    {{ else }}	
+			<a href={{.ActPlay}}><img src="static/play.png" width=146px></a>
+		    	{{ end }}
+		</div>
+    <p id="status">{{ .Info }}</p>
+	</div>	
+	<div id="menu">
+		<div style="display:block width:82px">
+		  <a href="{{.HostLink}}list"><img src="static/menu.png" width=82px></a>
+	  </div>
+	</div>
+ </body>
+</html>

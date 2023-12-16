@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024, user-scalable=yes">
+  <title>ZPlayer</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+ </head>
+ <body>
+	<h2>ZPlayer</h2>
+  <div class="plato">
+	  {{ range .List }}
+	  <a href={{.Href}}><p>
+	  {{.Artist}} - {{.Title}}</p></a>
+	  {{ end }}
+	</div>
+  <div class="quit">
+  	<button onclick="window.location.href='http://localhost:'+window.location.port+'/tube'">New</button>
+  </div>
+  <div class="quit">
+  	<button onclick="window.location.href='http://localhost:'+window.location.port+'/quit'">Quit</button>
+  </div>
+  
+ </body>
+</html>

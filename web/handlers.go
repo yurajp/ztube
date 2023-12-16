@@ -2,16 +2,32 @@ package web
 
 import (
 	"net/http"
+	"net/url"
   "log"
   "os/exec"
+  "fmt"
   
   "github.com/yurajp/ztube/ytube"
+  "github.com/yurajp/ztube/player"
+  "github.com/yurajp/ztube/config"
+  
 )
 
+var (
+	Dir = config.Conf.DirPath
+	Addr = ":" + config.Conf.Port + "/"
+	PList = player.PList
+//	Current *player.Song
+	Status string
+)
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
+	homeTmp.Execute(w, Addr)
+}
+
+func tubeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		homeTmp.Execute(w, nil)
+		tubeTmp.Execute(w, nil)
 	}
 	if r.Method == http.MethodPost {
 		err := r.ParseForm()
@@ -88,6 +104,71 @@ func watchHandler(w http.ResponseWriter, r *http.Request) {
 	v := ytube.Video
 	if v == "" {
 		return
+		return
 	}
 	exec.Command("xdg-open", v).Run()
+}
+
+//
+func listHandler(w http.ResponseWriter, r *http.Request) {
+  if PList.Dir == "" {
+    pl, err := player.Mp3List(Dir)
+    if err != nil {
+  	  http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+    PList = pl
+  }
+  listTmp.Execute(w, PList)
+}
+
+
+func songHandler(w http.ResponseWriter, r *http.Request) {
+  path := r.URL.Query().Get("path")
+  path, _ = url.QueryUnescape(path)
+  if path != "" {
+    cur, err := player.MakeSong(path)
+    if err != nil {
+    	fmt.Println("MakeSongError: ", err)
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+      return
+    }
+    err = cur.CurPicture()
+    if err != nil {
+    	fmt.Println("CurPicture", err)
+    }
+    player.Current = cur
+  }
+  
+  songTmp.Execute(w, player.Current)
+ }
+ 
+ 
+ func actionHandler(w http.ResponseWriter, r *http.Request) {
+  act := r.URL.Query().Get("act")
+  Status = player.Current.Info()
+  switch (act) {
+	  case "play":
+	    if Status == "Stopped" {
+	      player.Current.Play()
+	      fmt.Printf("\n >>> %s", player.Current.Title)
+	    }
+		  if Status == "Paused" {
+		  	player.Current.Resume()
+		  	fmt.Print(" >>> resumed")
+		  }
+	  case "pause":
+	    if Status == "Playing" {
+	      player.Current.Pause()
+	      fmt.Print(" >> paused")
+	    }
+	  case "stop":
+	    if Status != "Stopped" {
+	      player.Current.Stop()
+	      fmt.Println(" > stopped")
+	    }
+	  default:
+  }
+  Status = player.Current.Info()
+ 
+  songTmp.Execute(w, player.Current)
 }

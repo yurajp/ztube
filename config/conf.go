@@ -2,12 +2,21 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"errors"
 	"os"
 	
   "github.com/yurajp/confy"
 )
+
+func init() {
+	err := Prepare()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 
 type Config struct {
 	AppDir string

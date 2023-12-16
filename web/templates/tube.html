@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024, user-scalable=yes">
+  <title>Ztube</title>
+  <link rel="stylesheet" type="text/css" href="static/style.css">
+ </head>
+ <body>
+  <div class="plato">
+  	<div id="head">
+  	<div id="logo">
+  	  <img src="static/ZTUBE.png" width=96px>
+  	</div></div>
+  	<form method="POST">
+  		<label for="art">Artist</label><br>
+  		<input id="art" type="text" name="artist" value=""><br>
+  		<label for="ttl">Title</label><br>
+  		<input id="ttl" type="text" name="title" value=""><br>
+  		<label for="lk">Link (optionally)</label><br>
+  		<input type="text" name="link" value=""><br>
+  		<div class="cbx">
+  		<label for="mn">Manualy</label>
+  		<input id="mn" type="checkbox" name="manualy" value="true">
+  		</div>
+  		<div class="cbx">
+  			<label for="von">Video only</label>
+  			<input id="von" type="checkbox" name="vonly" value="true">
+  		</div>
+  		<div class="cbx">
+  			<label for="aon">Audio only</label>
+  			<input id="aon" type="checkbox" name="aonly" value="true">
+  		</div>
+  		<button type="submit">OK</button>
+  	</form>
+  </div>
+  <div class="quit">
+  	<button onclick="window.location.href='http://localhost:'+window.location.port+'/quit'">Quit</button>
+  </div>
+ </body>
+</html>
