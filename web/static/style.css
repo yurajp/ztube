@@ -77,14 +77,14 @@ body {
 .quit {
 	display: flex;
 	justify-content: center;
-	margin: 60px;
+	margin: 90px;
 	border-radius: 40px;
 }
 
 .quit button {
 	font-size: 1.4em;
 	font-weight: bold;
-	padding: 15px 60px;
+	padding: 12px 60px;
 	border-radius: 50px;
 	text-align:; center;
 	color: maroon;
@@ -118,7 +118,7 @@ h2 {text-align: center;}
 #player {
 	display: flex;
 	justify-content: space-around;
-	margin: 64px -16px 32px -16px;
+	margin: 84px -8px;
 	padding: 64px 24px 52px 24px;
 	border: 6px solid darkgreen;
 	border-radius: 100px;
@@ -139,6 +139,7 @@ h2 {text-align: center;}
   text-align: center;
 	background: darkgreen;
 	border-radius: 50px;
+	border: 2px solid #bbb;
 }
 
 .but a {

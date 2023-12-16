@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"html/template"
 	"log"
+	"fmt"
 	"os/exec"
 	
 	"github.com/yurajp/ztube/config"
 )
 
 var (
-	addr string
 	homeTmp *template.Template
 	tubeTmp *template.Template
 	linkTmp *template.Template
@@ -23,7 +23,7 @@ var (
 
 
 func WebStart() {
-	addr = ":" + config.Conf.Port
+	addr := ":" + config.Conf.Port
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", homeHandler)
 	mux.HandleFunc("/tube",tubeHandler)
@@ -57,4 +57,7 @@ func WebStart() {
 	}()
 	
 	exec.Command("xdg-open", "http://localhost" + addr).Run()
+	
+	fmt.Printf("    ZTUBE\n  Server runing on %s\n", addr)
 }
+

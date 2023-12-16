@@ -22,7 +22,11 @@ var (
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	homeTmp.Execute(w, Addr)
+	err := homeTmp.Execute(w, Addr)
+	if err != nil {
+		log.Printf(" homeTemplateErr: %s\n", err)
+		return
+	}
 }
 
 func tubeHandler(w http.ResponseWriter, r *http.Request) {
