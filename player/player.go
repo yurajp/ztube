@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"os/exec"
 	"errors"
+	"math/rand"
+	"time"
 	
 	"github.com/yurajp/ztube/config"
 )
@@ -15,8 +17,8 @@ import (
 var (
 	Dir = config.Conf.DirPath
 	Addr = ":" + config.Conf.Port
-	PList = Playlist{}
 	Current *Song
+	Playing bool
 )
 
 type Playlist struct {
@@ -31,25 +33,29 @@ type Song struct {
 	Picture string
 }
 
+func (pl *Playlist) Play() bool {
+	return Playing
+}
 
-func Mp3List(dir string) (Playlist, error) {
+func Mp3List(dir string) (*Playlist, error) {
 	ins, err := os.ReadDir(dir)
 	if err != nil {
-		return Playlist{}, err
+		return &Playlist{}, err
 	}
 	lst := []*Song{}
 	for _, f := range ins {
 		nm := f.Name()
-		if filepath.Ext(nm) == ".mp3" {
+		ext := filepath.Ext(nm)
+		if ext == ".mp3" || ext == ".ogg" {
 			s, err := MakeSong(nm)
 			if err != nil {
 				fmt.Println(err)
-				return Playlist{}, err
+				return &Playlist{}, err
 			}
 		  lst = append(lst, s)
 		}
 	}
-	return Playlist{dir, lst}, nil
+	return &Playlist{dir, lst}, nil
 }
 
 func MakeSong(path string) (*Song, error) {
@@ -57,10 +63,15 @@ func MakeSong(path string) (*Song, error) {
 		return &Song{}, errors.New("No path passed")
 	}
 	name := filepath.Base(path)
+	
 	line := strings.TrimSuffix(name, filepath.Ext(name))
 	fds := strings.Split(line, " - ")
 	art, ttl := fds[0], fds[1]
 	pnm := filepath.Join(Dir, "pics", line + ".png")
+	_, err := os.Stat(pnm)
+	if os.IsNotExist(err) {
+		pnm = filepath.Join(config.Conf.AppDir, "web", "static", "Z2.png")
+	}
 	fpath := filepath.Join(Dir, name)
 	
 	return &Song{fpath, art, ttl, pnm}, nil
@@ -80,7 +91,9 @@ func (s *Song) HostLink() string {
 }
 
 func (s *Song) Play() {
-	exec.Command("termux-media-player", "play", Current.Path).Run()
+	Current = s
+	exec.Command("termux-media-player", "play", s.Path).Run()
+	Playing = true
 }
 
 func (s *Song) ActPlay() string {
@@ -97,6 +110,7 @@ func (s *Song) ActPause() string {
 
 func (s *Song) Stop() {
 	exec.Command("termux-media-player", "stop").Run()
+	Playing = false
 }
 
 func (s *Song) ActStop() string {
@@ -130,3 +144,36 @@ func (s *Song) CurPicture() error {
 	return nil
 }
 
+func RandPlay(pl *Playlist) error {
+	lst := pl.List
+	length := len(lst)
+	if length == 0 {
+		return errors.New("Empty Playlist")
+	}
+	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rnd.Shuffle(5, func(i, j int){
+		lst[i], lst[j] = lst[j], lst[i]
+	})
+
+	pl.List = lst
+	for _, s := range lst {
+		s.Play()
+		for {
+      stat := s.Info()
+		  switch (stat) {
+			  case "Stopped":
+			    Playing =false
+			    break
+			  default:
+			    time.Sleep(time.Millisecond * 500)
+			}
+		}
+	}
+	StopPlay()
+	return nil
+}
+
+func StopPlay() {
+	exec.Command("termux-media-player", "stop").Run()
+	Playing = false
+}

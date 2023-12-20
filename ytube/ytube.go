@@ -212,5 +212,6 @@ func (o *Opts) Produce(lnk string) error {
 	}
   OnAir = false
   
+  fmt.Println("  Produced.")
 	return nil
 }

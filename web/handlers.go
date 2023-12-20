@@ -16,7 +16,7 @@ import (
 var (
 	Dir = config.Conf.DirPath
 	Addr = ":" + config.Conf.Port + "/"
-	PList = player.PList
+	PList *player.Playlist
 //	Current *player.Song
 	Status string
 )
@@ -58,7 +58,7 @@ func tubeHandler(w http.ResponseWriter, r *http.Request) {
 		go func() {
 			err = opts.Produce(link)
 		  if err != nil {
-		  	log.Printf("ProduceError: %w", err)
+		  	log.Printf("ProduceError: %s", err)
 		  }
 		}()
 		
@@ -91,6 +91,11 @@ func resHandler(w http.ResponseWriter, r *http.Request) {
 	if wait {
     resTmp.Execute(w, "WAIT...")
 	} else {
+    pl, err := player.Mp3List(Dir)
+    if err != nil {
+  	  http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+    PList = pl
     resTmp.Execute(w, "SUCCESS!")
 	}
 }
@@ -108,14 +113,13 @@ func watchHandler(w http.ResponseWriter, r *http.Request) {
 	v := ytube.Video
 	if v == "" {
 		return
-		return
 	}
 	exec.Command("xdg-open", v).Run()
 }
 
 //
 func listHandler(w http.ResponseWriter, r *http.Request) {
-  if PList.Dir == "" {
+  if PList == nil {
     pl, err := player.Mp3List(Dir)
     if err != nil {
   	  http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -132,17 +136,19 @@ func songHandler(w http.ResponseWriter, r *http.Request) {
   if path != "" {
     cur, err := player.MakeSong(path)
     if err != nil {
-    	fmt.Println("MakeSongError: ", err)
+    	log.Printf("MakeSongError: %s\n", err)
       http.Error(w, err.Error(), http.StatusInternalServerError)
       return
     }
     err = cur.CurPicture()
     if err != nil {
-    	fmt.Println("CurPicture", err)
+    	log.Printf("CurPictureError: %s\n", err)
     }
     player.Current = cur
   }
-  
+  if player.Playing {
+  	player.StopPlay()
+  }
   songTmp.Execute(w, player.Current)
  }
  
@@ -175,4 +181,25 @@ func songHandler(w http.ResponseWriter, r *http.Request) {
   Status = player.Current.Info()
  
   songTmp.Execute(w, player.Current)
+}
+
+func randHandler(w http.ResponseWriter, r *http.Request) {
+	if PList == nil {
+		return
+	}
+	if player.Playing {
+		player.StopPlay()
+    listTmp.Execute(w, PList)
+		return
+	}
+	err := player.RandPlay(PList)
+	if err != nil {
+		log.Printf("RandPlay: %s\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	listTmp.Execute(w, PList)
+}
+
+func stopHandler(w http.ResponseWriter, r *http.Request) {
+	player.StopPlay()
 }

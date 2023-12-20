@@ -3,11 +3,12 @@ package ytube
 import (
 	"fmt"
 	"strings"
+	"log"
 	"image"
 	"bytes"
 	"path/filepath"
 	"os/exec"
-	
+
   "github.com/gabriel-vasile/mimetype"
   "github.com/frolovo22/tag"
   ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -18,18 +19,15 @@ func audioName() string {
 	if Video == "" {
 		return ""
 	}
-	prts := strings.Split(Video, ".")
-	return strings.TrimSuffix(Video, prts[len(prts) - 1]) + "mp3"
+	mtyp, _ := mimetype.DetectFile(Video)
+	vidext := mtyp.Extension()
+	audext := ".mp3"
+	return strings.TrimSuffix(Video, vidext) + audext
 }
 
 func (o *Opts) MakeAudio() error {
-	mtyp, err := mimetype.DetectFile(Video)
-	if err != nil {
-		return fmt.Errorf("MimeError: %s", err)
-	}
-	audio := strings.TrimSuffix(Video, mtyp.Extension()) + ".mp3"
-	cmd := exec.Command("ffmpeg", "-i", Video, audio)
-	_, err = cmd.Output()
+	cmd := exec.Command("ffmpeg", "-i", Video, audioName())
+	_, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("ConvertingAudioError: %s", err)
 	}
@@ -44,10 +42,15 @@ func (o *Opts) MakeAudio() error {
 }
 
 func FrameImage(fileName string, frameNum int) (image.Image, error) {
+  ext := filepath.Ext(fileName)
+  if ext == ".webm" {
+  	return nil, nil
+  }
+  vcodec := "mjpeg"
   buf := bytes.NewBuffer(nil)
   err := ffmpeg.Input(fileName).
   	Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", frameNum)}).
-  	Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+  	Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": vcodec}).
      WithOutput(buf).Run()
 	if err != nil {
 		return nil, err
@@ -73,6 +76,10 @@ func SaveImage(frame, size int) error {
   if err != nil {
     return err
   }
+  if img == nil {
+  	log.Println("webm - no image")
+  	return nil
+  }
   img = Crop(img, size)
   imgFile := ImagePath()
   err = imaging.Save(img, imgFile)
@@ -93,6 +100,9 @@ func Crop(img image.Image, size int) image.Image {
 
 func (o *Opts) SetTags()	error {
 	audio := audioName()
+	if filepath.Ext(audio) == ".ogg" {
+		return nil
+	}
   meta, err := tag.ReadFile(audio)
   if err != nil {
 	  return fmt.Errorf("ReadFileError: %s", err)

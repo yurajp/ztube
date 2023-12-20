@@ -1,5 +1,5 @@
 body {
-	font-size: 2.2em;
+	font-size: 2.3em;
 	color: #eee;
 	background: #444444;
 }
@@ -33,6 +33,8 @@ body {
 	top: 30px;
 	padding-right: 240px;
 }
+
+
 
 .plato input {
 	margin: 20px 40px;
@@ -93,7 +95,10 @@ body {
 
 .plato a {
 	text-decoration: none;
- 	color: #eee; 
+ 	color: #eee;
+ 	font-family: Ubuntu, Sans-Serif;
+ 	font-size: 1.2em;
+ 	line-height: 0.9;
 }
 
 h2 {text-align: center;}
@@ -153,4 +158,19 @@ h2 {text-align: center;}
 #menu {
 	display: flex;
 	justify-content: center;
+}
+
+#rand {
+	display: flex;
+	margin: 30px 96px;
+	justify-content: space-between;
+}
+
+#rand button {
+	padding: 0px 48px;
+	background: #aaa;
+	color: #222222;
+	font-size: 1.3em;
+	font-weight: bold;
+	border-radius: 60px;
 }
