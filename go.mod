@@ -7,6 +7,7 @@ require (
 	github.com/frolovo22/tag v0.0.2
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kkdai/youtube/v2 v2.9.0
+	github.com/otiai10/copy v1.14.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/yurajp/confy v0.0.0-20231204162921-e1942e974c48
 )
@@ -22,5 +23,7 @@ require (
 	github.com/u2takey/go-utils v0.3.1 // indirect
 	golang.org/x/image v0.0.0-20191009234506-e7c1f5e7dbb8 // indirect
 	golang.org/x/net v0.17.0 // indirect
+	golang.org/x/sync v0.3.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 )

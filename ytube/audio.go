@@ -9,11 +9,14 @@ import (
 	"path/filepath"
 	"os/exec"
 
+	"github.com/yurajp/ztube/config"
   "github.com/gabriel-vasile/mimetype"
   "github.com/frolovo22/tag"
   ffmpeg "github.com/u2takey/ffmpeg-go"
 	"github.com/disintegration/imaging"
+	"github.com/otiai10/copy"
 )
+
 
 func audioName() string {
 	if Video == "" {
@@ -26,7 +29,8 @@ func audioName() string {
 }
 
 func (o *Opts) MakeAudio() error {
-	cmd := exec.Command("ffmpeg", "-i", Video, audioName())
+	aname := audioName()
+	cmd := exec.Command("ffmpeg", "-i", Video, aname)
 	_, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("ConvertingAudioError: %s", err)
@@ -38,6 +42,16 @@ func (o *Opts) MakeAudio() error {
      return fmt.Errorf("TagsError: %s", err)
 	}
 	fmt.Println("  Tags setted")
+	
+	shDir := config.Conf.ShareDir
+	if shDir != "" {
+		src := filepath.Base(aname)
+		shName := filepath.Join(shDir, src)
+		err = copy.Copy(aname, shName)
+		if err != nil {
+			log.Printf("Cannot copy to shareDir: %s\n", err)
+		}
+	}
 	return nil
 }
 
@@ -87,6 +101,7 @@ func SaveImage(frame, size int) error {
     return err
   }
   fmt.Println("  DONE")
+  
   return nil
 }  
 

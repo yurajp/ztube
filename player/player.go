@@ -17,15 +17,16 @@ import (
 var (
 	Dir = config.Conf.DirPath
 	Addr = ":" + config.Conf.Port
+  StopCh = make(chan struct{}, 1)
 	Current *Song
 	Playing bool
+	RandCh = make(chan string, 1)
 )
 
 type Playlist struct {
 	Dir string
 	List []*Song
 }
-
 type Song struct {
 	Path string
 	Artist string
@@ -144,36 +145,58 @@ func (s *Song) CurPicture() error {
 	return nil
 }
 
+func (s *Song) IsCurr() bool {
+	return s == Current
+}
+
 func RandPlay(pl *Playlist) error {
+	if pl == nil {
+		p, err := Mp3List(Dir)
+		if err != nil {
+			return err
+		}
+		pl = p
+	}
 	lst := pl.List
 	length := len(lst)
 	if length == 0 {
 		return errors.New("Empty Playlist")
 	}
-	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-	rnd.Shuffle(5, func(i, j int){
+  rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(length, func(i, j int) {
 		lst[i], lst[j] = lst[j], lst[i]
 	})
-
-	pl.List = lst
-	for _, s := range lst {
-		s.Play()
-		for {
-      stat := s.Info()
-		  switch (stat) {
-			  case "Stopped":
-			    Playing =false
-			    break
-			  default:
-			    time.Sleep(time.Millisecond * 500)
-			}
-		}
-	}
-	StopPlay()
+	
+	go func() {
+		Play:
+	  for _, s := range lst {
+      if !Playing {
+        RandCh <-s.Title
+		    Current = s
+        s.Play()
+        Wait:
+		    for {
+		      select {
+		      case <-StopCh:
+		        RandCh <-""
+		        fmt.Println("  Interrupted")
+		        Current.Stop()
+            Playing = false
+		        break Play
+		      default:
+            stat := s.Info()
+		        switch (stat) {
+			        case "Stopped":
+			        Playing = false
+			        break Wait
+			      default:
+			        time.Sleep(time.Millisecond * 300)
+		        }
+		  	  }
+		    }
+		  }
+	  }
+  }()
+  
 	return nil
-}
-
-func StopPlay() {
-	exec.Command("termux-media-player", "stop").Run()
-	Playing = false
 }

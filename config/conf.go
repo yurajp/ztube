@@ -22,6 +22,7 @@ type Config struct {
 	AppDir string
 	DirPath string
 	Port string
+	ShareDir string
 }
 
 var Conf *Config
@@ -52,7 +53,6 @@ func SetConfTerm() error {
 	  	todo = false
 	  }
 	}
-	
 	_, err := os.Stat(dir)
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(dir, 0750)
@@ -61,7 +61,12 @@ func SetConfTerm() error {
 		}
 		fmt.Printf("  Directory '%s' was created\n", dir)
 	}
-	Conf = &Config{wd, dir, prt}
+	
+	var shd string
+	fmt.Println("  Type path to folder for sharing audio (optionally)\n  ")
+	fmt.Scanf("%s", &shd)
+	
+	Conf = &Config{wd, dir, prt, shd}
 	
 	err = confy.WriteConfy(*Conf)
 	if err != nil {

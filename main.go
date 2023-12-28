@@ -8,12 +8,12 @@ import (
 
 
 func main() {
-
+	
 	web.WebStart()
 	
 	defer func() {
 		if player.Playing {
-		  player.StopPlay()
+		  player.Current.Stop()
 		}
 	}()
 	

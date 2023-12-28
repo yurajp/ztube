@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
   "log"
+//  "time"
   "os/exec"
   "fmt"
   
@@ -144,11 +145,12 @@ func songHandler(w http.ResponseWriter, r *http.Request) {
     if err != nil {
     	log.Printf("CurPictureError: %s\n", err)
     }
+    if player.Playing {
+  	  player.Current.Stop()
+    }
     player.Current = cur
   }
-  if player.Playing {
-  	player.StopPlay()
-  }
+  
   songTmp.Execute(w, player.Current)
  }
  
@@ -184,22 +186,28 @@ func songHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func randHandler(w http.ResponseWriter, r *http.Request) {
-	if PList == nil {
-		return
-	}
-	if player.Playing {
-		player.StopPlay()
-    listTmp.Execute(w, PList)
-		return
-	}
-	err := player.RandPlay(PList)
-	if err != nil {
-		log.Printf("RandPlay: %s\n", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	listTmp.Execute(w, PList)
-}
+	
+ 	if player.Playing {
+// 		player.Current.Stop()
+ 	  player.StopCh <-struct{}{}
+//   	PList = nil
+//   	http.Redirect(w, r, "/list", 302)
+// 		return
+ 	}
 
-func stopHandler(w http.ResponseWriter, r *http.Request) {
-	player.StopPlay()
+  err := player.RandPlay(PList)
+  if err != nil {
+	  log.Printf("RandPlay: %s\n", err)
+	  http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	
+	for {
+	  t := <-player.RandCh
+	  if t == "" {
+	  	fmt.Println("  The end")
+	  	return
+	  } else {
+	  	listHandler(w, r)
+	  }
+	}
 }

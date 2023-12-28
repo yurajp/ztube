@@ -32,6 +32,7 @@ var (
 	Video string
 )
 
+
 func (o *Opts) SetCodeFromLink(url string) bool {
 	sep := "?v="
 	ss := strings.Split(url, sep)
@@ -152,7 +153,7 @@ func (o *Opts) DownloadVideo() error {
 		return fmt.Errorf("Cannot rename: %s", err)
 	}
 	fmt.Printf("\n  Downloaded  %s\n", fname + ext)
-  
+	
 	return nil
 }
 

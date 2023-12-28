@@ -35,7 +35,6 @@ func WebStart() {
 	mux.HandleFunc("/quit", quitHandler)
   mux.HandleFunc("/list", listHandler)
   mux.HandleFunc("/rand", randHandler)
-  mux.HandleFunc("/stop", stopHandler)
 	stdir := config.Conf.AppDir + "/web/static"
 	fs := http.FileServer(http.Dir(stdir))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
