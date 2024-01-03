@@ -12,6 +12,7 @@ import (
 	"errors"
 	
 	"github.com/yurajp/ztube/config"
+	"github.com/yurajp/ztube/atag"
   "github.com/kkdai/youtube/v2"
   "github.com/gabriel-vasile/mimetype"
 )
@@ -20,6 +21,10 @@ type Opts struct {
 	Artist string
 	Title string
 	Code string
+	Album string
+	Year string
+	Duration int
+	Identify bool
 	Manualy bool
 	VideoOnly bool
 	AudioOnly bool
@@ -170,7 +175,18 @@ func (o *Opts) Produce(lnk string) error {
 	path = config.Conf.DirPath
 	OnAir = true
 	GetCodeError := errors.New("Cannot get code from url")
-	
+	if o.Identify {
+	  atagTr, err := atag.Recognize("")
+	  if err != nil {
+	  	return fmt.Errorf("atag Recognize: %s", err)
+	  }
+	  o.Artist = atagTr.Artist
+	  o.Title = atagTr.Title
+	  o.Album = atagTr.Album
+	  yr := fmt.Sprintf("%d", atagTr.Year)
+	  o.Year = yr
+	}
+
 	if o.Manualy {
 		o.OpenSearch()
 		
@@ -202,15 +218,19 @@ func (o *Opts) Produce(lnk string) error {
 	  if err != nil {
 	  	return err
 	  }
-	  err = SaveImage(64, 500)
-	  if err != nil {
-	  	return err
-	  }
 	}
+
+//	  err = SaveImage(64, 500)
+//	  if err != nil {
+//	  	return err
+//	  }
+//	}
+
 	if o.AudioOnly {
 		os.Remove(Video)
 		Video = ""
 	}
+	
   OnAir = false
   
   fmt.Println("  Produced.")

@@ -6,10 +6,13 @@ import (
 	"log"
 	"image"
 	"bytes"
+	"strconv"
 	"path/filepath"
 	"os/exec"
 
 	"github.com/yurajp/ztube/config"
+//	"github.com/yurajp/ztube/atag"
+	"github.com/yurajp/ztube/deezer"
   "github.com/gabriel-vasile/mimetype"
   "github.com/frolovo22/tag"
   ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -36,12 +39,27 @@ func (o *Opts) MakeAudio() error {
 		return fmt.Errorf("ConvertingAudioError: %s", err)
 	}
 	fmt.Println("  Audio extracted")
-	
+	searchSng := fmt.Sprintf("%s %s", o.Artist, o.Title)
+	dzTr, err := deezer.DeezerTrack(searchSng)
+	if err != nil {
+		return fmt.Errorf("Deezer error: %s", err)
+	}
+	o.Duration = dzTr.Duration
+	if o.Album == "" {
+		o.Album = dzTr.Album.Title
+	}
 	err = o.SetTags()
 	if err != nil {
      return fmt.Errorf("TagsError: %s", err)
 	}
 	fmt.Println("  Tags setted")
+	
+	go func() {
+		err := deezer.GetCover(dzTr)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
 	
 	shDir := config.Conf.ShareDir
 	if shDir != "" {
@@ -129,6 +147,15 @@ func (o *Opts) SetTags()	error {
   err = meta.SetArtist(o.Artist)
     if err != nil {
 	    return fmt.Errorf("SetArtistTagError: %s", err)
+  }
+  err = meta.SetAlbum(o.Album)
+    if err != nil {
+	    return fmt.Errorf("SetAlbumTagError: %s", err)
+  }
+  year, _ := strconv.Atoi(o.Year)
+  err = meta.SetYear(year)
+    if err != nil {
+	    return fmt.Errorf("SetYearTagError: %s", err)
   }
   
   err = meta.SaveFile(audio)

@@ -3,11 +3,13 @@ module github.com/yurajp/ztube
 go 1.21.4
 
 require (
+	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/frolovo22/tag v0.0.2
 	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/kkdai/youtube/v2 v2.9.0
 	github.com/otiai10/copy v1.14.0
+	github.com/tcolgate/mp3 v0.0.0-20170426193717-e79c5a46d300
 	github.com/u2takey/ffmpeg-go v0.5.0
 	github.com/yurajp/confy v0.0.0-20231204162921-e1942e974c48
 )

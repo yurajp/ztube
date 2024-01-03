@@ -71,6 +71,19 @@ func tubeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func recognizeHandler(w http.ResponseWriter, r *http.Request) {
+	opts := &ytube.Opts{}
+	opts.Identify = true
+	
+	go func() {
+		err := opts.Produce("")
+	  if err != nil {
+		 	log.Printf("ProduceError: %s\n", err)
+		}
+	}()
+  http.Redirect(w, r, "/result", 302)
+}
+
 func linkHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		linkTmp.Execute(w, nil)

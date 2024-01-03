@@ -12,6 +12,7 @@ import (
 	"time"
 	
 	"github.com/yurajp/ztube/config"
+  "github.com/frolovo22/tag"
 )
 
 var (
@@ -64,12 +65,15 @@ func MakeSong(path string) (*Song, error) {
 		return &Song{}, errors.New("No path passed")
 	}
 	name := filepath.Base(path)
-	
 	line := strings.TrimSuffix(name, filepath.Ext(name))
 	fds := strings.Split(line, " - ")
 	art, ttl := fds[0], fds[1]
-	pnm := filepath.Join(Dir, "pics", line + ".png")
+	pnm := filepath.Join(Dir, "pics", line + ".jpg")
 	_, err := os.Stat(pnm)
+	if os.IsNotExist(err) {
+		pnm = filepath.Join(Dir, "pics", line + ".png")
+	}
+	_, err = os.Stat(pnm)
 	if os.IsNotExist(err) {
 		pnm = filepath.Join(config.Conf.AppDir, "web", "static", "Z2.png")
 	}
@@ -89,6 +93,30 @@ func (s *Song) Href() string {
 
 func (s *Song) HostLink() string {
 	return fmt.Sprintf("http://localhost%s/", Addr)
+}
+
+func (s *Song) Album() string {
+  meta, err := tag.ReadFile(s.Path)
+  if err != nil {
+	  return ""
+  }
+  alb, err := meta.GetAlbum()
+  if err != nil {
+  	return ""
+  }
+  return alb
+}
+
+func (s *Song) Year() string {
+  meta, err := tag.ReadFile(s.Path)
+  if err != nil {
+	  return ""
+  }
+  year, err := meta.GetYear()
+  if err != nil {
+  	return ""
+  }
+  return fmt.Sprintf("%d", year)
 }
 
 func (s *Song) Play() {

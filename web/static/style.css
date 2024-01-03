@@ -8,8 +8,8 @@ body {
 	display: block;
 	margin: 50px 30px;
 	padding: 50px 40px;
-	background-color: #222222;
-	border: 8px solid darkgreen;
+	background-color: #262626;
+	border: 8px solid steelblue;
 	border-radius: 36px;
 }
 #head {
@@ -19,13 +19,14 @@ body {
 #logo {
 	display: block;
 	padding: 20px 30px;
-	border: 6px solid darkgreen;
+	border: 6px solid steelblue;
 	border-radius: 88px;
 	background: #aaa;
 }
 
 .plato h1 {
 	text-align: center;
+	color: yellow;
 }
 
 .plato h2 span {
@@ -89,8 +90,9 @@ body {
 	padding: 12px 60px;
 	border-radius: 50px;
 	text-align:; center;
-	color: maroon;
-	background: #bbb;
+	color: #eee;
+	background: brown;
+	text-shadow: 2px 3px 1px black;
 }
 
 .plato a {
@@ -110,24 +112,34 @@ h2 {text-align: center;}
 
 #tags {
 	text-align: center;
+	
 }
 
 #artist {
 	color: #ccc;
+	font-size: 1.2em;
 }
 
 #title {
 	font-size: 1.4em;
 }
 
+#album {
+	font-size: 1.0em;
+}
+
+#year {
+	font-size: 1.2em;
+}
+
 #player {
 	display: flex;
 	justify-content: space-around;
 	margin: 84px -8px;
-	padding: 64px 24px 52px 24px;
-	border: 6px solid darkgreen;
+	padding: 54px 24px 46px 24px;
+	border: 6px solid steelblue;
 	border-radius: 100px;
-	background: #222222;
+	background: #444444;
 }
 
 #status {
@@ -140,19 +152,37 @@ h2 {text-align: center;}
 .but {
 	display: block;
 	width: 36%;
-  padding: 22px 16px;
+  padding: 26px 16px;
   text-align: center;
-	background: darkgreen;
+	background: darkblue;
 	border-radius: 50px;
 	border: 2px solid #bbb;
 }
 
 .but a {
-	
 	text-decoration: none;
-	color: #ccc;
+	color: #eee;
 	fonthweight: bold;
 	font-size: 1.4em;
+	text-shadow: 3px 4px 2px black;
+}
+
+#rec {
+	display: block;
+	width: 66%;
+  padding: 24px 16px;
+  text-align: center;
+	background: darkorange;
+	border-radius: 50px;
+	border: 2px solid #bbb;
+}
+
+#rec a {
+  text-decoration: none;
+	color: darkred;
+	font-weight: bold;
+	font-size: 1.5em;
+	text-shadow: 3px 4px 2px #ccc;
 }
 
 #menu {
@@ -168,9 +198,10 @@ h2 {text-align: center;}
 
 #rand button {
 	padding: 0px 48px;
-	background: #aaa;
-	color: #222222;
+	background: teal;
+	color: #ccc;
 	font-size: 1.3em;
 	font-weight: bold;
 	border-radius: 60px;
+	text-shadow: 2px 3px 1px black;
 }

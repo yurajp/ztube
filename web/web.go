@@ -26,6 +26,7 @@ func WebStart() {
 	addr := ":" + config.Conf.Port
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", homeHandler)
+	mux.HandleFunc("/recognize", recognizeHandler)
 	mux.HandleFunc("/tube",tubeHandler)
 	mux.HandleFunc("/link", linkHandler)
 	mux.HandleFunc("/result", resHandler)

@@ -23,6 +23,7 @@ type Config struct {
 	DirPath string
 	Port string
 	ShareDir string
+	ImgDir string
 }
 
 var Conf *Config
@@ -66,7 +67,11 @@ func SetConfTerm() error {
 	fmt.Println("  Type path to folder for sharing audio (optionally)\n  ")
 	fmt.Scanf("%s", &shd)
 	
-	Conf = &Config{wd, dir, prt, shd}
+	var imd string
+	fmt.Println("  Type path to folder for store images (optionally)\n  ")
+	fmt.Scanf("%s", &imd)
+	
+	Conf = &Config{wd, dir, prt, shd, imd}
 	
 	err = confy.WriteConfy(*Conf)
 	if err != nil {
