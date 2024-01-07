@@ -218,13 +218,17 @@ func ConvertToWav(dir, f string) (func(), error) {
 	if err != nil {
 		return func(){}, err
 	}
-	clear := func() {
+	clr := func() {
 		os.Remove(out)
 	}
-	return clear, nil
+	return clr, nil
 }
 
 func Wave(f string) string {
+	_, err := os.Stat(WavDir)
+	if os.IsNotExist(err) {
+		os.Mkdir(WavDir, 0750)
+	}
 	ext := filepath.Ext(f)
 	name := filepath.Base(f)
 	return filepath.Join(WavDir, strings.TrimSuffix(name, ext) + ".wav")
@@ -361,7 +365,7 @@ func Recognize(file string) (*Track, error) {
 		}
 	} else {
 		d := filepath.Dir(file)
-		if d == "." {
+		if d == "." {// relative
 		  dir = Dir
 		} else {
 			dir = d

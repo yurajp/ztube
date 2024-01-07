@@ -7,16 +7,20 @@
   <link rel="stylesheet" type="text/css" href="static/style.css">
  </head>
  <body>
+
  	<div id="rand">
 	<h2>ZPlayer</h2>
 	<button type="button" onclick="window.location.href='http://localhost:'+window.location.port+'/rand'"> {{if .Play }} Stop {{ else }} RandPlay {{end}}</button>
 	</div>
-	
+
   <div class="plato">
-	  {{ range .List }}
+
+	{{ range .List }}
+
 	  <a href={{.Href}}><p {{ if .IsCurr }} style="color: orange" {{ end }}>
-	  {{.Artist}} - {{.Title}}</p></a>
-	  {{ end }}
+	  {{ .Artist }} - {{ .Title }}</p></a>
+	  {{ end }}   
+	  
 	</div>
   <div class="quit">
   	<button onclick="window.location.href='http://localhost:'+window.location.port+'/tube'">New</button>

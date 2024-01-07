@@ -2,9 +2,9 @@ package web
 
 import (
 	"net/http"
-	"net/url"
+//	"net/url"
   "log"
-//  "time"
+  "strconv"
   "os/exec"
   "fmt"
   
@@ -18,7 +18,7 @@ var (
 	Dir = config.Conf.DirPath
 	Addr = ":" + config.Conf.Port + "/"
 	PList *player.Playlist
-//	Current *player.Song
+	Current *player.Song
 	Status string
 )
 
@@ -105,11 +105,11 @@ func resHandler(w http.ResponseWriter, r *http.Request) {
 	if wait {
     resTmp.Execute(w, "WAIT...")
 	} else {
-    pl, err := player.Mp3List(Dir)
+    pl, err := player.NewList()
     if err != nil {
   	  http.Error(w, err.Error(), http.StatusInternalServerError)
     }
-    PList = pl
+    PList = &pl
     resTmp.Execute(w, "SUCCESS!")
 	}
 }
@@ -133,36 +133,33 @@ func watchHandler(w http.ResponseWriter, r *http.Request) {
 
 //
 func listHandler(w http.ResponseWriter, r *http.Request) {
-  if PList == nil {
-    pl, err := player.Mp3List(Dir)
-    if err != nil {
-  	  http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
-    PList = pl
+ 	if PList != nil {
+     listTmp.Execute(w, PList)
+     return
+ 	}
+  pl, err := player.NewList()
+  if err != nil {
+  	log.Printf("NewList error: %s\n", err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
   }
+  PList = &pl
+  
   listTmp.Execute(w, PList)
 }
 
 
 func songHandler(w http.ResponseWriter, r *http.Request) {
-  path := r.URL.Query().Get("path")
-  path, _ = url.QueryUnescape(path)
-  if path != "" {
-    cur, err := player.MakeSong(path)
-    if err != nil {
-    	log.Printf("MakeSongError: %s\n", err)
-      http.Error(w, err.Error(), http.StatusInternalServerError)
-      return
-    }
-    err = cur.CurPicture()
-    if err != nil {
-    	log.Printf("CurPictureError: %s\n", err)
-    }
-    if player.Playing {
-  	  player.Current.Stop()
-    }
-    player.Current = cur
+  sid := r.URL.Query().Get("id")
+  id, err := strconv.Atoi(sid)
+  if err != nil {
+  	log.Printf("Cannot get id: %s\n", err)
+  	http.Error(w, err.Error(), http.StatusInternalServerError)
   }
+  if player.Playing {
+  	player.Current.Stop()
+  }
+  sng := PList.GetSong(id)
+  player.Current = sng
   
   songTmp.Execute(w, player.Current)
  }
@@ -208,7 +205,7 @@ func randHandler(w http.ResponseWriter, r *http.Request) {
 // 		return
  	}
 
-  err := player.RandPlay(PList)
+  err := player.RandPlay(*PList)
   if err != nil {
 	  log.Printf("RandPlay: %s\n", err)
 	  http.Error(w, err.Error(), http.StatusInternalServerError)

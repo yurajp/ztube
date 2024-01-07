@@ -22,7 +22,7 @@ type Opts struct {
 	Title string
 	Code string
 	Album string
-	Year string
+	Year int
 	Duration int
 	Identify bool
 	Manualy bool
@@ -183,8 +183,7 @@ func (o *Opts) Produce(lnk string) error {
 	  o.Artist = atagTr.Artist
 	  o.Title = atagTr.Title
 	  o.Album = atagTr.Album
-	  yr := fmt.Sprintf("%d", atagTr.Year)
-	  o.Year = yr
+	  o.Year = atagTr.Year
 	}
 
 	if o.Manualy {
@@ -233,6 +232,7 @@ func (o *Opts) Produce(lnk string) error {
 	
   OnAir = false
   
-  fmt.Println("  Produced.")
 	return nil
 }
+
+

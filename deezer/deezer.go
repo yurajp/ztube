@@ -122,6 +122,8 @@ func GetCover(tr *Track) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Cover downloaded")
+	fmt.Println("  Cover downloaded")
+	fmt.Println("  DONE\n")
+	
 	return nil
 }

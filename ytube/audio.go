@@ -6,13 +6,13 @@ import (
 	"log"
 	"image"
 	"bytes"
-	"strconv"
 	"path/filepath"
 	"os/exec"
 
 	"github.com/yurajp/ztube/config"
-//	"github.com/yurajp/ztube/atag"
+	"github.com/yurajp/ztube/atag"
 	"github.com/yurajp/ztube/deezer"
+	"github.com/yurajp/ztube/database"
   "github.com/gabriel-vasile/mimetype"
   "github.com/frolovo22/tag"
   ffmpeg "github.com/u2takey/ffmpeg-go"
@@ -31,6 +31,8 @@ func audioName() string {
 	return strings.TrimSuffix(Video, vidext) + audext
 }
 
+
+
 func (o *Opts) MakeAudio() error {
 	aname := audioName()
 	cmd := exec.Command("ffmpeg", "-i", Video, aname)
@@ -48,18 +50,46 @@ func (o *Opts) MakeAudio() error {
 	if o.Album == "" {
 		o.Album = dzTr.Album.Title
 	}
+	if !o.Identify {
+		atr, err := atag.Recognize(aname)
+		if err != nil {
+			fmt.Println(err)
+		}
+		o.Year = atr.Year
+		if o.Year == 0 {
+			fmt.Println("  no year")
+		}
+		if atr.Title != o.Title {
+			fmt.Printf("  Differents track's titles!\n  1. '%s'\n  2. '%s'\n", atr.Title, o.Title)
+		}
+	}
+	dbTr := database.NewTrack()
+	dbTr.Artist = o.Artist
+	dbTr.Title = o.Title
+	dbTr.Album = o.Album
+	dbTr.Year = o.Year
+	dbTr.Duration = o.Duration
+	dbTr.Code = o.Code
+	dbTr.Path = aname
 	err = o.SetTags()
 	if err != nil {
      return fmt.Errorf("TagsError: %s", err)
 	}
 	fmt.Println("  Tags setted")
 	
-	go func() {
-		err := deezer.GetCover(dzTr)
-		if err != nil {
-			fmt.Println(err)
-		}
-	}()
+	imgName := fmt.Sprintf("%s -%s.jpg", o.Artist, o.Title)
+	imgPath := filepath.Join(config.Conf.ImgDir, imgName)
+	err = deezer.GetCover(dzTr)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		dbTr.Cover = imgPath
+	}
+	
+	err = dbTr.AddTrackToDb()
+	if err != nil {
+		fmt.Println(err)
+	}
 	
 	shDir := config.Conf.ShareDir
 	if shDir != "" {
@@ -72,6 +102,7 @@ func (o *Opts) MakeAudio() error {
 	}
 	return nil
 }
+
 
 func FrameImage(fileName string, frameNum int) (image.Image, error) {
   ext := filepath.Ext(fileName)
@@ -99,7 +130,7 @@ func ImagePath() string {
 		return ""
 	}
 	prts := strings.Split(Video, ".")
-	dir, file := filepath.Split(strings.TrimSuffix(Video, prts[len(prts) - 1]) + "png")
+	dir, file := filepath.Split(strings.TrimSuffix(Video, prts[len(prts) - 1]) + "jpg")  // png
 	return filepath.Join(dir, "pics", file)
 }
 
@@ -152,8 +183,7 @@ func (o *Opts) SetTags()	error {
     if err != nil {
 	    return fmt.Errorf("SetAlbumTagError: %s", err)
   }
-  year, _ := strconv.Atoi(o.Year)
-  err = meta.SetYear(year)
+  err = meta.SetYear(o.Year)
     if err != nil {
 	    return fmt.Errorf("SetYearTagError: %s", err)
   }

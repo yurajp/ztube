@@ -9,13 +9,15 @@
  <body>
 	<div class="plato">
 		<div id="pic">
-			<img src="static/current.png" width="500px">
+			<img src="{{ .ImgStat }}" width="600px">
 		</div> 
 		<div id="tags">
 		  <p id="artist">{{ .Artist }}</p>
 		  <p id="title">{{ .Title }}</p>
-		  <p id="album">{{ .Album }}</p>
-		  <p id="year">{{ .Year }}</p>
+		  <p id="album">{{ .Album }}
+		  {{ if .Year }} - 
+		  {{ .Year }}
+		  {{ end }} </p>
 		</div>
 	  
 	  <div id="player">

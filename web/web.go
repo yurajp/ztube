@@ -7,6 +7,8 @@ import (
 	"log"
 	"fmt"
 	"os/exec"
+	"path/filepath"
+	"os"
 	
 	"github.com/yurajp/ztube/config"
 )
@@ -45,7 +47,12 @@ func WebStart() {
   linkTmp, _ = template.ParseFiles(tmpdir + "link.html")
   resTmp, _ = template.ParseFiles(tmpdir + "result.html")
   songTmp, _ = template.ParseFiles(tmpdir + "song.html")
-  listTmp, _ = template.ParseFiles(tmpdir + "list.html")
+  lTmp, err := template.ParseFiles(tmpdir + "list.html")
+  if err != nil {
+  	log.Printf(" Parse listTmp: %s\n", err)
+  } else {
+  	listTmp = lTmp
+  }
   
   server := http.Server{
   	Addr: addr,
@@ -57,9 +64,10 @@ func WebStart() {
 			log.Fatal(err)
 		}
 	}()
-	
+	imgPath := filepath.Join(config.Conf.AppDir, "web", "static", "currImg")
+	os.Create(imgPath)
 	exec.Command("xdg-open", "http://localhost" + addr).Run()
 	
-	fmt.Printf("    ZTUBE\n  Server runing on %s\n", addr)
+	fmt.Printf("\n    ZTUBE\n  Server runing on %s\n", addr)
 }
 

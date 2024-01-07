@@ -135,7 +135,7 @@ h2 {text-align: center;}
 #player {
 	display: flex;
 	justify-content: space-around;
-	margin: 84px -8px;
+	margin: 84px 8px;
 	padding: 54px 24px 46px 24px;
 	border: 6px solid steelblue;
 	border-radius: 100px;
