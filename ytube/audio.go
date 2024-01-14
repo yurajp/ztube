@@ -44,11 +44,12 @@ func (o *Opts) MakeAudio() error {
 	searchSng := fmt.Sprintf("%s %s", o.Artist, o.Title)
 	dzTr, err := deezer.DeezerTrack(searchSng)
 	if err != nil {
-		return fmt.Errorf("Deezer error: %s", err)
-	}
-	o.Duration = dzTr.Duration
-	if o.Album == "" {
-		o.Album = dzTr.Album.Title
+	  fmt.Printf("Deezer error: %s", err)
+	} else {
+	  o.Duration = dzTr.Duration
+	  if o.Album == "" {
+		  o.Album = dzTr.Album.Title
+	  }
 	}
 	if !o.Identify {
 		atr, err := atag.Recognize(aname)

@@ -176,3 +176,21 @@ func RandPlay(pl Playlist) error {
   
 	return nil
 }
+
+//func (s *Song) Idx() int {
+//	for i, tr := range PList {
+//		if s == tr {
+//			return i
+//		}
+//	}
+//	return 0
+//}
+
+//func (s *Song) Next() int {
+//	return (s.Idx() + 1) % PList.Length
+//}
+
+//func (s *Song) Prev() int {
+//	return (PLists.Length + s.Idx() - 1) % PList.Length
+//}
+

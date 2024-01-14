@@ -198,11 +198,7 @@ func songHandler(w http.ResponseWriter, r *http.Request) {
 func randHandler(w http.ResponseWriter, r *http.Request) {
 	
  	if player.Playing {
-// 		player.Current.Stop()
  	  player.StopCh <-struct{}{}
-//   	PList = nil
-//   	http.Redirect(w, r, "/list", 302)
-// 		return
  	}
 
   err := player.RandPlay(*PList)
